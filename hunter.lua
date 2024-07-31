@@ -193,8 +193,6 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 	local Ability, Form, Buff, Debuff, PetAbility, PvPTalent = ids.BM_Ability, ids.BM_Form, ids.BM_Buff, ids.BM_Debuff, ids.BM_PetAbility, ids.BM_PvPTalent;
 
 --Abilities	
-	local _AMurderofCrows, _AMurderofCrows_RDY = ConRO:AbilityReady(Ability.AMurderofCrows, timeShift);
-	local _ArcaneShot, _ArcaneShot_RDY = ConRO:AbilityReady(Ability.ArcaneShot, timeShift);
 	local _BarbedShot, _BarbedShot_RDY, _BarbedShot_CD = ConRO:AbilityReady(Ability.BarbedShot, timeShift);
 		local _BarbedShot_CHARGES, _BarbedShot_MaxCHARGES, _BarbedShot_CCD, _BarbedShot_MCCD = ConRO:SpellCharges(_BarbedShot);
 		local _Frenzy_BUFF, _Frenzy_COUNT, _Frenzy_DUR = ConRO:UnitAura(Buff.Frenzy, timeShift, 'pet');
@@ -207,7 +205,6 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 	local _CallPet, _CallPet_RDY = ConRO:AbilityReady(Ability.CallPet.One, timeShift);
 	local _CobraShot, _CobraShot_RDY = ConRO:AbilityReady(Ability.CobraShot, timeShift);
 	local _CounterShot, _CounterShot_RDY = ConRO:AbilityReady(Ability.CounterShot, timeShift);
-	local _DeathChakram, _DeathChakram_RDY = ConRO:AbilityReady(Ability.DeathChakram, timeShift);
 	local _DireBeast, _DireBeast_RDY, _DireBeast_CD = ConRO:AbilityReady(Ability.DireBeast, timeShift);
 	local _ExplosiveShot, _ExplosiveShot_RDY = ConRO:AbilityReady(Ability.ExplosiveShot, timeShift);
 	local _Flare, _Flare_RDY = ConRO:AbilityReady(Ability.Flare, timeShift);
@@ -222,17 +219,12 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 		local _BeastCleave_BUFF, _, _BeastCleave_DUR = ConRO:Aura(Buff.BeastCleave, timeShift + 1);
 	local _PrimalRageCR = ConRO:AbilityReady(Ability.CommandPet.PrimalRage, timeShift);
 	local _PrimalRage, _PrimalRage_RDY = ConRO:AbilityReady(PetAbility.PrimalRage, timeShift, 'pet');
-	local _SerpentSting, _SerpentSting_RDY = ConRO:AbilityReady(Ability.SerpentSting, timeShift);
-		local _SerpentSting_BUFF = ConRO:Aura(Buff.SerpentSting, timeShift + 5);
-	local _Stampede, _Stampede_RDY = ConRO:AbilityReady(Ability.Stampede, timeShift);
-	local _SteelTrap, _SteelTrap_RDY = ConRO:AbilityReady(Ability.SteelTrap, timeShift);
 	local _TarTrap, _TarTrap_RDY = ConRO:AbilityReady(Ability.TarTrap, timeShift);
 		local _TarTrap_DEBUFF = ConRO:TargetAura(Debuff.TarTrap, timeShift);
 	local _TranquilizingShot, _TranquilizingShot_RDY = ConRO:AbilityReady(Ability.TranquilizingShot, timeShift);
-	local _WailingArrow, _WailingArrow_RDY = ConRO:AbilityReady(Ability.WailingArrow, timeShift);
 
 --Conditions
-	local _enemies_in_range, _target_in_range = ConRO:Targets(Ability.ArcaneShot);
+	local _enemies_in_40yrds, _target_in_40yrds = ConRO:Targets("40");
 
 	local _Pet_summoned = ConRO:CallPet();
 	local _Pet_assist = ConRO:PetAssist();
@@ -243,12 +235,9 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 	ConRO:AbilityPurge(_ArcaneTorrent, _ArcaneTorrent_RDY and _target_in_melee and ConRO:Purgable());
 	ConRO:AbilityPurge(_TranquilizingShot, _TranquilizingShot_RDY and ConRO:Purgable());
 
-	ConRO:AbilityBurst(_AMurderofCrows, _AMurderofCrows_RDY and _in_combat and ConRO:BurstMode(_AMurderofCrows));
 	ConRO:AbilityBurst(_BestialWrath, _BestialWrath_RDY and _in_combat and ConRO:BurstMode(_BestialWrath));
 	ConRO:AbilityBurst(_Bloodshed, _Bloodshed_RDY and _in_combat and ConRO:BurstMode(_Bloodshed));
 	ConRO:AbilityBurst(_CalloftheWild, _CalloftheWild_RDY and _in_combat and ConRO:BurstMode(_CalloftheWild));
-	ConRO:AbilityBurst(_DeathChakram, _DeathChakram_RDY and _in_combat and ConRO:BurstMode(_DeathChakram));
-	ConRO:AbilityBurst(_Stampede, _Stampede_RDY and _BestialWrath_BUFF and ConRO:BurstMode(_Stampede));
 	ConRO:AbilityBurst(_PrimalRage, _PrimalRage_RDY and _party_size <= 1 and _in_combat and not _Heroism_BUFF and not _Sated_DEBUFF);
 	ConRO:AbilityBurst(_PrimalRageCR, _PrimalRage_RDY and _party_size <= 1 and _in_combat and not _Heroism_BUFF and not _Sated_DEBUFF);
 
@@ -258,11 +247,6 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 --Rotations
 	for i = 1, 2, 1 do
 		if not _in_combat then
-			if _WailingArrow_RDY then
-				tinsert(ConRO.SuggestedSpells, _WailingArrow);
-				_WailingArrow_RDY = false;
-			end
-
 			if _BarbedShot_RDY and _BarbedShot_CHARGES >= 1 then
 				tinsert(ConRO.SuggestedSpells, _BarbedShot);
 				_BarbedShot_CHARGES = _BarbedShot_CHARGES - 1;
@@ -288,12 +272,12 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 			_BarbedShot_CHARGES = _BarbedShot_CHARGES - 1;
 		end
 
-		if _BarbedShot_RDY and ((_BarbedShot_CHARGES >= _BarbedShot_MaxCHARGES - 1 and _BarbedShot_CCD <= 3) or (_BarbedShot_CHARGES >= 1 and _BestialWrath_CD <= 20 and tChosen[Ability.ScentofBlood.talentID])) and ((ConRO_AutoButton:IsVisible() and _enemies_in_range >= 3) or ConRO_AoEButton:IsVisible()) then
+		if _BarbedShot_RDY and ((_BarbedShot_CHARGES >= _BarbedShot_MaxCHARGES - 1 and _BarbedShot_CCD <= 3) or (_BarbedShot_CHARGES >= 1 and _BestialWrath_CD <= 20 and tChosen[Ability.ScentofBlood.talentID])) and ((ConRO_AutoButton:IsVisible() and _enemies_in_40yrds >= 3) or ConRO_AoEButton:IsVisible()) then
 			tinsert(ConRO.SuggestedSpells, _BarbedShot);
 			_BarbedShot_CHARGES = _BarbedShot_CHARGES - 1;
 		end
 
-		if _MultiShot_RDY and tChosen[Ability.BeastCleave.talentID] and not _BeastCleave_BUFF and ((ConRO_AutoButton:IsVisible() and _enemies_in_range >= 3) or ConRO_AoEButton:IsVisible()) then
+		if _MultiShot_RDY and tChosen[Ability.BeastCleave.talentID] and not _BeastCleave_BUFF and ((ConRO_AutoButton:IsVisible() and _enemies_in_40yrds >= 3) or ConRO_AoEButton:IsVisible()) then
 			tinsert(ConRO.SuggestedSpells, _MultiShot);
 			_BeastCleave_BUFF = true;
 		end
@@ -308,34 +292,19 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 			_CalloftheWild_RDY = false;
 		end
 
-		if _ExplosiveShot_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_range >= 3) or ConRO_AoEButton:IsVisible()) then
+		if _ExplosiveShot_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_40yrds >= 3) or ConRO_AoEButton:IsVisible()) then
 			tinsert(ConRO.SuggestedSpells, _ExplosiveShot);
 			_ExplosiveShot_RDY = false;
 		end
 
-		if _Bloodshed_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_range <= 1) or ConRO_SingleButton:IsVisible()) and ConRO:FullMode(_Bloodshed) then
+		if _Bloodshed_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_40yrds <= 1) or ConRO_SingleButton:IsVisible()) and ConRO:FullMode(_Bloodshed) then
 			tinsert(ConRO.SuggestedSpells, _Bloodshed);
 			_Bloodshed_RDY = false;
 		end
 
-		if _Stampede_RDY and ConRO:FullMode(_Stampede) then
-			tinsert(ConRO.SuggestedSpells, _Stampede);
-			_Stampede_RDY = false;
-		end
-
-		if _DeathChakram_RDY and ConRO:FullMode(_DeathChakram) then
-			tinsert(ConRO.SuggestedSpells, _DeathChakram);
-			_DeathChakram_RDY = false;
-		end
-
-		if _AMurderofCrows_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_range <= 1) or ConRO_SingleButton:IsVisible()) and ConRO:FullMode(_AMurderofCrows) then
+		if _AMurderofCrows_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_40yrds <= 1) or ConRO_SingleButton:IsVisible()) and ConRO:FullMode(_AMurderofCrows) then
 			tinsert(ConRO.SuggestedSpells, _AMurderofCrows);
 			_AMurderofCrows_RDY = false;
-		end
-
-		if _SteelTrap_RDY and ((ConRO_AutoButton:IsVisible() and _enemies_in_range <= 1) or ConRO_SingleButton:IsVisible()) then
-			tinsert(ConRO.SuggestedSpells, _SteelTrap);
-			_SteelTrap_RDY = false;
 		end
 
 		if _ExplosiveShot_RDY then
@@ -358,22 +327,17 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 			_AMurderofCrows_RDY = false;
 		end
 
-		if _SteelTrap_RDY then
-			tinsert(ConRO.SuggestedSpells, _SteelTrap);
-			_SteelTrap_RDY = false;
-		end
-
-		if _BarbedShot_RDY and ((_BarbedShot_CHARGES >= _BarbedShot_MaxCHARGES - 1 and _BarbedShot_CCD <= 8) or _CalloftheWild_BUFF) and ((ConRO_AutoButton:IsVisible() and _enemies_in_range >= 3) or ConRO_AoEButton:IsVisible()) then
+		if _BarbedShot_RDY and ((_BarbedShot_CHARGES >= _BarbedShot_MaxCHARGES - 1 and _BarbedShot_CCD <= 8) or _CalloftheWild_BUFF) and ((ConRO_AutoButton:IsVisible() and _enemies_in_40yrds >= 3) or ConRO_AoEButton:IsVisible()) then
 			tinsert(ConRO.SuggestedSpells, _BarbedShot);
 			_BarbedShot_CHARGES = _BarbedShot_CHARGES - 1;
 		end
 
-		if _KillCommand_RDY and _KillCommand_CHARGES >= 1 and ((ConRO_AutoButton:IsVisible() and _enemies_in_range <= 1) or ConRO_SingleButton:IsVisible()) then
+		if _KillCommand_RDY and _KillCommand_CHARGES >= 1 and ((ConRO_AutoButton:IsVisible() and _enemies_in_40yrds <= 1) or ConRO_SingleButton:IsVisible()) then
 			tinsert(ConRO.SuggestedSpells, _KillCommand);
 			_KillCommand_CHARGES = _KillCommand_CHARGES - 1;
 		end
 
-		if _BarbedShot_RDY and ((_BarbedShot_CHARGES >= _BarbedShot_MaxCHARGES - 1 and _BarbedShot_CCD <= 6) or (_BarbedShot_CHARGES >= 1 and _BestialWrath_CD <= 20 and tChosen[Ability.ScentofBlood.talentID]) or _CalloftheWild_BUFF) and ((ConRO_AutoButton:IsVisible() and _enemies_in_range <= 2) or ConRO_SingleButton:IsVisible()) then
+		if _BarbedShot_RDY and ((_BarbedShot_CHARGES >= _BarbedShot_MaxCHARGES - 1 and _BarbedShot_CCD <= 6) or (_BarbedShot_CHARGES >= 1 and _BestialWrath_CD <= 20 and tChosen[Ability.ScentofBlood.talentID]) or _CalloftheWild_BUFF) and ((ConRO_AutoButton:IsVisible() and _enemies_in_40yrds <= 2) or ConRO_SingleButton:IsVisible()) then
 			tinsert(ConRO.SuggestedSpells, _BarbedShot);
 			_BarbedShot_CHARGES = _BarbedShot_CHARGES - 1;
 		end
@@ -383,12 +347,7 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 			_DireBeast_RDY = false;
 		end
 
-		if _SerpentSting_RDY and not _SerpentSting_BUFF then
-			tinsert(ConRO.SuggestedSpells, _SerpentSting);
-			_SerpentSting_RDY = false;
-		end
-
-		if _Barrage_RDY and _Frenzy_DUR >= 4 and ((ConRO_AutoButton:IsVisible() and _enemies_in_range >= 3) or ConRO_AoEButton:IsVisible()) then
+		if _Barrage_RDY and _Frenzy_DUR >= 4 and ((ConRO_AutoButton:IsVisible() and _enemies_in_40yrds >= 3) or ConRO_AoEButton:IsVisible()) then
 			tinsert(ConRO.SuggestedSpells, _Barrage);
 			_Barrage_RDY = false;
 		end
@@ -400,11 +359,6 @@ function ConRO.Hunter.BeastMastery(_, timeShift, currentSpell, gcd, tChosen, pvp
 
 		if _CobraShot_RDY then
 			tinsert(ConRO.SuggestedSpells, _CobraShot);
-		end
-
-		if _WailingArrow_RDY and _Frenzy_DUR >= 3 then
-			tinsert(ConRO.SuggestedSpells, _WailingArrow);
-			_WailingArrow_RDY = false;
 		end
 	end
 	return nil;
